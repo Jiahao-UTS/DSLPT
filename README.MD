@@ -1,4 +1,4 @@
-#Dynamic Sparse Local Patch Transformer
+# Dynamic Sparse Local Patch Transformer
 
 PyTorch training code and pretrained models for **DSLPT** (Dynamic Sparse Local Patch Transformer).
 
