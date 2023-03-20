@@ -62,19 +62,14 @@ class Dynamic_sparse_alignment_network(nn.Module):
         return torch.mean(loss1)
 
     def forward(self, image, ground_truth=None, is_train=False):
-        # 获取Batch_size
         bs = image.size(0)
 
-        # 声明输出列表
         output_list = []
 
-        # 生成初始人脸关键点
         feature_map = self.backbone(image)
         initial_landmarks = self.initial_points.repeat(bs, 1, 1).to(image.device)
         bbox_scale_1 = self.initial_scale.repeat(bs, 1, 1).to(image.device)
 
-        # stage_1
-        # ROI feature提取
         ROI_anchor_1, bbox_size_1, start_anchor_1 = self.ROI(initial_landmarks.detach(), bbox_scale_1)
         ROI_anchor_1 = ROI_anchor_1.view(bs, self.num_point * self.Sample_num * self.Sample_num, 2)
         ROI_feature_1 = self.interpolation(feature_map, ROI_anchor_1.detach()).view(bs, self.num_point, self.Sample_num,
@@ -120,7 +115,6 @@ class Dynamic_sparse_alignment_network(nn.Module):
             ground_truth_2 = ((ground_truth - start_anchor_2) / bbox_size_2).unsqueeze(1)
             loss2 = self.Gaussian_loss(offset_mean_2, offset_std_2, ground_truth_2)
 
-        # stage_3
         bbox_scale_3 = bbox_scale_2 * torch.clamp(
             torch.max(offset_std_2[:, -1, :, :].detach() * 12, dim=2, keepdim=True)[0], 0.5, 0.7)
         ROI_anchor_3, bbox_size_3, start_anchor_3 = self.ROI(landmarks_2[:, -1, :, :].detach(), bbox_scale_3)
@@ -138,7 +132,6 @@ class Dynamic_sparse_alignment_network(nn.Module):
         offset_std_3 = self.out_std_layer(offset_3)
         offset_std_3 = 1 / (1 + torch.exp(-offset_std_3))
 
-        # 获得最后输出结果
         landmarks_3 = start_anchor_3.unsqueeze(1) + bbox_size_3.unsqueeze(1) * offset_mean_3
         output_list.append(landmarks_3)
 
