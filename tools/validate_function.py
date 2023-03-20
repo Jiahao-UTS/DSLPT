@@ -43,7 +43,6 @@ def validate(config, val_loader, model, loss_function, output_dir, writer_dict=N
             batch_time.update(time.time() - end)
             end = time.time()
 
-            # 每config.PRINT_FREQ次打印一次训练信息
             if i % config.PRINT_FREQ == 0:
                 msg = 'Epoch: [{0}/{1}]\t' \
                       'Time {batch_time.val:.3f}s ({batch_time.avg:.3f}s)\t' \
@@ -58,7 +57,6 @@ def validate(config, val_loader, model, loss_function, output_dir, writer_dict=N
                     NME_stage3=NME_stage3)
                 logger.info(msg)
 
-        # TensorboardX写出信息
         writer = writer_dict['writer']
         global_steps = writer_dict['valid_global_steps']
         writer.add_scalar('validate_loss', loss_average.avg, global_steps)
