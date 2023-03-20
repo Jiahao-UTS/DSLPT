@@ -56,18 +56,12 @@ def transform_pixel_v2(pt, trans, inverse=False):
 
 
 def main_function():
-    # 获得参数
     args = parse_args()
-    # 更新参数
     update_config(cfg, args)
-    # 创建日志文件目录
     logger, final_output_dir, tb_log_dir = create_logger(cfg, cfg.TARGET)
-    # 输入输入参数
     logger.info(pprint.pformat(args))
-    # 输入CFG配置参数
     logger.info(cfg)
 
-    # 配置CUDNN参数
     torch.backends.cudnn.benchmark = cfg.CUDNN.BENCHMARK
     torch.backends.cudnn.deterministic = cfg.CUDNN.DETERMINISTIC
     torch.backends.cudnn.enabled = cfg.CUDNN.ENABLED
@@ -86,7 +80,6 @@ def main_function():
     )
 
     if cfg.DATASET.DATASET == 'WFLW':
-        # 读取验证数据并且解码
         valid_dataset = WFLW_Dataset(
             cfg, cfg.WFLW.ROOT, False,
             transforms.Compose([
@@ -97,7 +90,6 @@ def main_function():
     else:
         raise NotImplementedError
 
-    # 验证数据迭代器
     valid_loader = torch.utils.data.DataLoader(
         valid_dataset,
         batch_size=1,
